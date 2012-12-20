@@ -66,7 +66,7 @@ hook 'before_template' => sub {
 
 hook 'before' => sub {
   $conf ||= _get_conf();
-  my $id = params->{ $conf->{param_key} };
+  my $id = params->{ $conf->{params_key} };
   var( $conf->{var_key} => $id )
     if $id;
 };
@@ -76,7 +76,7 @@ hook 'after' => sub {
   $conf ||= _get_conf();
   if ( var( $conf->{var_key} ) && $response->status =~ /^3/ ) {
     my $u = URI->new( $response->header("Location") );
-    $u->query_param( $conf->{param_key} => var $conf->{var_key} );
+    $u->query_param( $conf->{params_key} => var $conf->{var_key} );
     $response->header( "Location" => $u );
   }
 };
@@ -91,7 +91,7 @@ sub _get_id {
 sub _get_conf {
   return {
     var_key            => 'dpdid',
-    param_key          => 'dpdid',
+    params_key          => 'dpdid',
     session_key_prefix => 'dpd_',
     template_key       => 'deferred',
     %{ plugin_setting() },
