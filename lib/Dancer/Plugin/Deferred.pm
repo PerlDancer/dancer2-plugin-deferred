@@ -30,7 +30,7 @@ register 'deferred' => sub {
     $data->{$key} = $value;
   }
   else {
-    $value = delete $data->{$key};
+    $value = var( $conf->{var_keep_key} ) ? $data->{$key} : delete $data->{$key};
   }
 
   # store remaining data or clear it if no deferred messages are left
@@ -53,9 +53,20 @@ sub _get_all_deferred {
   $conf ||= _get_conf();
   my $id = _get_id();
   my $data = session( $conf->{session_key_prefix} . $id ) || {};
-  session $conf->{session_key_prefix} . $id => undef;
-  var $conf->{var_key}                      => undef;
+  unless ( var $conf->{var_keep_key} ) {
+    session $conf->{session_key_prefix} . $id => undef;
+    var $conf->{var_key}                      => undef;
+  }
   return $data;
+}
+
+register 'deferred_param' => \&_get_deferred_param;
+
+sub _get_deferred_param {
+  my ($arg) = @_;
+  $conf ||= _get_conf();
+  var $conf->{var_keep_key} => 1;
+  return ( $conf->{params_key} => var $conf->{var_key} );
 }
 
 hook 'before_template' => sub {
@@ -76,7 +87,7 @@ hook 'after' => sub {
   $conf ||= _get_conf();
   if ( var( $conf->{var_key} ) && $response->status =~ /^3/ ) {
     my $u = URI->new( $response->header("Location") );
-    $u->query_param( $conf->{params_key} => var $conf->{var_key} );
+    $u->query_param( _get_deferred_param() );
     $response->header( "Location" => $u );
   }
 };
@@ -91,7 +102,8 @@ sub _get_id {
 sub _get_conf {
   return {
     var_key            => 'dpdid',
-    params_key          => 'dpdid',
+    var_keep_key       => 'dpd_keep',
+    params_key         => 'dpdid',
     session_key_prefix => 'dpd_',
     template_key       => 'deferred',
     %{ plugin_setting() },
@@ -139,13 +151,10 @@ When a template is rendered, a pre-template hook retrieves the data and
 deletes it from the session.  Alternatively, the data can be retrieved manually
 (which will also automatically delete the data.)
 
-=head1 CONFIGURATION
-
-=for :list
-* C<var_key: dpdid> -- this is the key in the C<var> hash containing the message ID
-* C<params_key: dpdid> -- this is the key in the C<params> hash containing the message ID
-* C<session_key_prefix>: dpd_> -- the message ID is appended to this prefix and used to store deferred data in the session
-* C<template_key: deferred> -- this is the key to deferred data passed to the template
+Alternatively, the message ID parameters can be retrieved and used to
+construct a hyperlink for a message to be retrieved later.  In this case,
+the message is preserved past the template hook.  (The template should be
+sure not to render the message if not desired.)
 
 =head1 USAGE
 
@@ -166,6 +175,23 @@ data hash.
 This function returns all the deferred data as a hash reference and deletes
 the stored data.  This is called automatically in the C<before_template_render>
 hook, but is available if someone wants to have manual control.
+
+=head2 deferred_param
+
+  template 'index' => { link => uri_for( '/other', { deferred_param } ) };
+
+This function returns the parameter key and value used to propagate the
+message to another request.  Using this function toggles the C<var_keep_key>
+variable to true to ensure the message remains to be retrieved by the link.
+
+=head1 CONFIGURATION
+
+=for :list
+* C<var_key: dpdid> -- this is the key in the C<var> hash containing the message ID
+* C<var_keep_key: dpd_keep> -- if this key in C<var> is true, retrieving values will not be destructive
+* C<params_key: dpdid> -- this is the key in the C<params> hash containing the message ID
+* C<session_key_prefix>: dpd_> -- the message ID is appended to this prefix and used to store deferred data in the session
+* C<template_key: deferred> -- this is the key to deferred data passed to the template
 
 =head1 SEE ALSO
 
