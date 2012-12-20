@@ -1,0 +1,147 @@
+=pod
+
+=head1 NAME
+
+Dancer::Plugin::Deferred - Defer messages or data across redirections
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+  use Dancer::Plugin::Deferred;
+
+  get '/defer' => sub {
+    deferred error => "Klaatu barada nikto";
+    redirect '/later';
+  }
+
+  get '/later' => sub {
+    template 'later';
+  }
+
+  # in template 'later.tt'
+  <% IF deferred.error %>
+  <div class="error"><% deferred.error %></div>
+  <% END %>
+
+=head1 DESCRIPTION
+
+This L<Dancer> plugin provides a method for deferring a one-time message across
+a redirect.  It is similar to "flash" messages, but without the race conditions
+that can result from multiple tabs in a browser or from AJAX requests.  It is
+similar in design to L<Catalyst::Plugin::StatusMessage>, but adapted for Dancer.
+
+It works by creating a unique message ID within the session that holds deferred
+data.  The message ID is automatically added as a query parameter to redirection
+requests.  It's sort of like a session within a session, but tied to a request
+rather than global to the browser.  (It will even chain across multiple
+redirects.)
+
+When a template is rendered, a pre-template hook retrieves the data and
+deletes it from the session.  Alternatively, the data can be retrieved manually
+(which will also automatically delete the data.)
+
+=for Pod::Coverage method_names_here
+
+=head1 CONFIGURATION
+
+=over 4
+
+=item *
+
+C<var_key: dpdid> -- this is the key in the C<var> hash containing the message ID
+
+=item *
+
+C<params_key: dpdid> -- this is the key in the C<params> hash containing the message ID
+
+=item *
+
+C<session_key_prefix>: dpd_> -- the message ID is appended to this prefix and used to store deferred data in the session
+
+=item *
+
+C<template_key: deferred> -- this is the key to deferred data passed to the template
+
+=back
+
+=head1 USAGE
+
+=head2 deferred
+
+  deferred $key => $value;
+  $value = deferred $key; # also deletes $key
+
+This function works just like C<var> or C<session>, except that it lasts only
+for the current request and across any redirects.  Data is deleted if accessed.
+If a key is set to an undefined value, the key is deleted from the deferred
+data hash.
+
+=head2 all_deferred
+
+  template 'index', { deferred => all_deferred };
+
+This function returns all the deferred data as a hash reference and deletes
+the stored data.  This is called automatically in the C<before_template_render>
+hook, but is available if someone wants to have manual control.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<Dancer>
+
+=item *
+
+L<Dancer::Plugin::FlashMessage>
+
+=item *
+
+L<Dancer::Plugin::FlashNote>
+
+=item *
+
+L<Catalyst::Plugin::StatusMessage>
+
+=back
+
+=head1 ACKNOWLEDGMENTS
+
+Thank you to mst for explaining why L<Catalyst::Plugin::StatusMessages> does
+what it does and putting up with my dumb ideas along the way.
+
+=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+
+=head1 SUPPORT
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests through the issue tracker
+at L<https://github.com/dagolden/dancer-plugin-deferred/issues>.
+You will be notified automatically of any progress on your issue.
+
+=head2 Source Code
+
+This is open source software.  The code repository is available for
+public review and contribution under the terms of the license.
+
+L<https://github.com/dagolden/dancer-plugin-deferred>
+
+  git clone git://github.com/dagolden/dancer-plugin-deferred.git
+
+=head1 AUTHOR
+
+David Golden <dagolden@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by David Golden.
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
+
