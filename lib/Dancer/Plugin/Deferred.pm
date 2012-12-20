@@ -175,7 +175,7 @@ hook, but is available if someone wants to have manual control.
 * L<Dancer::Plugin::FlashNote>
 * L<Catalyst::Plugin::StatusMessage>
 
-=head1 ACKNOWLEDGEMENTS
+=head1 ACKNOWLEDGMENTS
 
 Thank you to mst for explaining why L<Catalyst::Plugin::StatusMessages> does
 what it does and putting up with my dumb ideas along the way.
