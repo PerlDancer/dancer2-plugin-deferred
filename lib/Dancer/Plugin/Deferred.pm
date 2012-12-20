@@ -142,10 +142,10 @@ deletes it from the session.  Alternatively, the data can be retrieved manually
 =head1 CONFIGURATION
 
 =for :list
-* C<var_key = dpdid> -- this is the key in the C<var> hash containing the message ID
-* C<param_key = dpdid> -- this is the key in the C<params> hash containing the message ID
-* C<session_key_prefix> = dpd_> -- the message ID is appended to this prefix and used to store deferred data in the session
-* C<template_key = deferred> -- this is the key to deferred data passed to the template
+* C<var_key: dpdid> -- this is the key in the C<var> hash containing the message ID
+* C<params_key: dpdid> -- this is the key in the C<params> hash containing the message ID
+* C<session_key_prefix>: dpd_> -- the message ID is appended to this prefix and used to store deferred data in the session
+* C<template_key: deferred> -- this is the key to deferred data passed to the template
 
 =head1 USAGE
 
