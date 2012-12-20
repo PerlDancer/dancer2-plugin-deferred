@@ -1,0 +1,185 @@
+use 5.008001;
+use strict;
+use warnings;
+
+package Dancer::Plugin::Deferred;
+# ABSTRACT: Defer messages or data across redirections
+# VERSION
+
+use Carp qw/croak/;
+use URI;
+use URI::QueryParam;
+
+use Dancer ':syntax';
+use Dancer::Plugin;
+
+my $conf;
+
+register 'deferred' => sub {
+  my ( $self, $key, $value ) = plugin_args(@_);
+  $conf ||= _get_conf();
+
+  my $id = _get_id();
+
+  # message data is flat "dpd_$id" to avoid race condition with
+  # another session
+  my $data = session( $conf->{session_key_prefix} . $id ) || {};
+
+  # set value or destructively retrieve it
+  if ( defined $value ) {
+    $data->{$key} = $value;
+  }
+  else {
+    $value = delete $data->{$key};
+  }
+
+  # store remaining data or clear it if no deferred messages are left
+  if ( keys %$data ) {
+    session $conf->{session_key_prefix} . $id => $data;
+    var $conf->{var_key}                      => $id;
+  }
+  else {
+    session $conf->{session_key_prefix} . $id => undef;
+    var $conf->{var_key}                      => undef;
+  }
+
+  return $value;
+};
+
+# destructively return all keys
+register 'all_deferred' => \&_get_all_deferred;
+
+sub _get_all_deferred {
+  $conf ||= _get_conf();
+  my $id = _get_id();
+  my $data = session( $conf->{session_key_prefix} . $id ) || {};
+  session $conf->{session_key_prefix} . $id => undef;
+  var $conf->{var_key}                      => undef;
+  return $data;
+}
+
+hook 'before_template' => sub {
+  my $data = shift;
+  $conf ||= _get_conf();
+  $data->{ $conf->{template_key} } = _get_all_deferred();
+};
+
+hook 'before' => sub {
+  $conf ||= _get_conf();
+  my $id = params->{ $conf->{param_key} };
+  var( $conf->{var_key} => $id )
+    if $id;
+};
+
+hook 'after' => sub {
+  my $response = shift;
+  $conf ||= _get_conf();
+  if ( var( $conf->{var_key} ) && $response->status =~ /^3/ ) {
+    my $u = URI->new( $response->header("Location") );
+    $u->query_param( $conf->{param_key} => var $conf->{var_key} );
+    $response->header( "Location" => $u );
+  }
+};
+
+# not crypto strong, but will be stored in session, which should be
+sub _get_id {
+  $conf ||= _get_conf();
+  return var( $conf->{var_key} )
+    || sprintf( "%08d", int( rand(100_000_000) ) );
+}
+
+sub _get_conf {
+  return {
+    var_key            => 'dpdid',
+    param_key          => 'dpdid',
+    session_key_prefix => 'dpd_',
+    template_key       => 'deferred',
+    %{ plugin_setting() },
+  };
+}
+
+register_plugin for_versions => [ 1, 2 ];
+
+1;
+
+=for Pod::Coverage method_names_here
+
+=head1 SYNOPSIS
+
+  use Dancer::Plugin::Deferred;
+
+  get '/defer' => sub {
+    deferred error => "Klaatu barada nikto";
+    redirect '/later';
+  }
+
+  get '/later' => sub {
+    template 'later';
+  }
+
+  # in template 'later.tt'
+  <% IF deferred.error %>
+  <div class="error"><% deferred.error %></div>
+  <% END %>
+
+=head1 DESCRIPTION
+
+This L<Dancer> plugin provides a method for deferring a one-time message across
+a redirect.  It is similar to "flash" messages, but without the race conditions
+that can result from multiple tabs in a browser or from AJAX requests.  It is
+similar in design to L<Catalyst::Plugin::StatusMessage>, but adapted for Dancer.
+
+It works by creating a unique message ID within the session that holds deferred
+data.  The message ID is automatically added as a query parameter to redirection
+requests.  It's sort of like a session within a session, but tied to a request
+rather than global to the browser.  (It will even chain across multiple
+redirects.)
+
+When a template is rendered, a pre-template hook retrieves the data and
+deletes it from the session.  Alternatively, the data can be retrieved manually
+(which will also automatically delete the data.)
+
+=head1 CONFIGURATION
+
+=for :list
+* C<var_key = dpdid> -- this is the key in the C<var> hash containing the message ID
+* C<param_key = dpdid> -- this is the key in the C<params> hash containing the message ID
+* C<session_key_prefix> = dpd_> -- the message ID is appended to this prefix and used to store deferred data in the session
+* C<template_key = deferred> -- this is the key to deferred data passed to the template
+
+=head1 USAGE
+
+=head2 deferred
+
+  deferred $key => $value;
+  $value = deferred $key; # also deletes $key
+
+This function works just like C<var> or C<session>, except that it lasts only
+for the current request and across any redirects.  Data is deleted if accessed.
+If a key is set to an undefined value, the key is deleted from the deferred
+data hash.
+  
+=head2 all_deferred
+
+  template 'index', { deferred => all_deferred };
+
+This function returns all the deferred data as a hash reference and deletes
+the stored data.  This is called automatically in the C<before_template_render>
+hook, but is available if someone wants to have manual control.
+
+=head1 SEE ALSO
+
+=for :list
+* L<Dancer>
+* L<Dancer::Plugin::FlashMessage>
+* L<Dancer::Plugin::FlashNote>
+* L<Catalyst::Plugin::StatusMessage>
+
+=head1 ACKNOWLEDGEMENTS
+
+Thank you to mst for explaining why L<Catalyst::Plugin::StatusMessages> does
+what it does and putting up with my dumb ideas along the way.
+
+=cut
+
+# vim: ts=2 sts=2 sw=2 et:
