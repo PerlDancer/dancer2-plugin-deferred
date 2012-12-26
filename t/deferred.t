@@ -39,6 +39,12 @@ test_tcp(
     set confdir => '.';
     set port => $port, startup_info => 0;
 
+    # Dancer 2 setting
+    if (int(dancer_version) == 2) {
+        Dancer->runner->server->port($port);
+        @{engine('template')->config}{qw(start_tag end_tag)} = qw(<% %>);
+    }
+
     set show_errors => 1;
 
     set views => path( 't', 'views' );
@@ -62,7 +68,7 @@ test_tcp(
       template 'index';
     };
 
-    Dancer->dance;
+    dance;
   },
 );
 done_testing;
