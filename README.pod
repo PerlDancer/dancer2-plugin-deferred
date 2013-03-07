@@ -2,15 +2,15 @@
 
 =head1 NAME
 
-Dancer::Plugin::Deferred - Defer messages or data across redirections
+Dancer2::Plugin::Deferred - Defer messages or data across redirections
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
-  use Dancer::Plugin::Deferred;
+  use Dancer2::Plugin::Deferred;
 
   get '/defer' => sub {
     deferred error => "Klaatu barada nikto";
@@ -28,10 +28,10 @@ version 0.003
 
 =head1 DESCRIPTION
 
-This L<Dancer> plugin provides a method for deferring a one-time message across
+This L<Dancer2> plugin provides a method for deferring a one-time message across
 a redirect.  It is similar to "flash" messages, but without the race conditions
 that can result from multiple tabs in a browser or from AJAX requests.  It is
-similar in design to L<Catalyst::Plugin::StatusMessage>, but adapted for Dancer.
+similar in design to L<Catalyst::Plugin::StatusMessage>, but adapted for Dancer2.
 
 It works by creating a unique message ID within the session that holds deferred
 data.  The message ID is automatically added as a query parameter to redirection
@@ -110,7 +110,7 @@ C<template_key: deferred> -- this is the key to deferred data passed to the temp
 
 =item *
 
-L<Dancer>
+L<Dancer2>
 
 =item *
 
@@ -138,7 +138,7 @@ what it does and putting up with my dumb ideas along the way.
 =head2 Bugs / Feature Requests
 
 Please report any bugs or feature requests through the issue tracker
-at L<https://github.com/dagolden/dancer-plugin-deferred/issues>.
+at L<https://github.com/dagolden/dancer2-plugin-deferred/issues>.
 You will be notified automatically of any progress on your issue.
 
 =head2 Source Code
@@ -146,13 +146,17 @@ You will be notified automatically of any progress on your issue.
 This is open source software.  The code repository is available for
 public review and contribution under the terms of the license.
 
-L<https://github.com/dagolden/dancer-plugin-deferred>
+L<https://github.com/dagolden/dancer2-plugin-deferred>
 
-  git clone git://github.com/dagolden/dancer-plugin-deferred.git
+  git clone git://github.com/dagolden/dancer2-plugin-deferred.git
 
 =head1 AUTHOR
 
 David Golden <dagolden@cpan.org>
+
+=head1 CONTRIBUTOR
+
+Damien Krotkine <dams@zarb.org>
 
 =head1 COPYRIGHT AND LICENSE
 

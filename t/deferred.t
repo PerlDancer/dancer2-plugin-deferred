@@ -4,8 +4,8 @@ use warnings;
 use Test::More 0.96 import => ['!pass'];
 use Test::TCP;
 
-use Dancer ':syntax';
-use Dancer::Plugin::Deferred;
+use Dancer2 ':syntax';
+use Dancer2::Plugin::Deferred;
 use LWP::UserAgent;
 
 test_tcp(
@@ -39,11 +39,8 @@ test_tcp(
     set confdir => '.';
     set port => $port, startup_info => 0;
 
-    # Dancer 2 setting
-    if (int(dancer_version) == 2) {
-        Dancer->runner->server->port($port);
-        @{engine('template')->config}{qw(start_tag end_tag)} = qw(<% %>);
-    }
+    Dancer2->runner->server->port($port);
+    @{engine('template')->config}{qw(start_tag end_tag)} = qw(<% %>);
 
     set show_errors => 1;
 
@@ -68,7 +65,7 @@ test_tcp(
       template 'index';
     };
 
-    dance;
+    start;
   },
 );
 done_testing;

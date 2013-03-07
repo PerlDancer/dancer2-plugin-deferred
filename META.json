@@ -4,7 +4,7 @@
       "David Golden <dagolden@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921",
    "license" : [
       "apache_2_0"
    ],
@@ -12,7 +12,7 @@
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : "2"
    },
-   "name" : "Dancer-Plugin-Deferred",
+   "name" : "Dancer2-Plugin-Deferred",
    "no_index" : {
       "directory" : [
          "t",
@@ -41,8 +41,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Dancer" : "0",
-            "Dancer::Plugin" : "0",
+            "Dancer2::Plugin" : "0",
             "URI" : "0",
             "URI::QueryParam" : "0",
             "perl" : "5.010",
@@ -52,9 +51,13 @@
       },
       "test" : {
          "requires" : {
+            "Dancer2" : "0",
+            "ExtUtils::MakeMaker" : "0",
             "File::Find" : "0",
+            "File::Spec::Functions" : "0",
             "File::Temp" : "0",
             "LWP::UserAgent" : "0",
+            "List::Util" : "0",
             "Test::More" : "0.96",
             "Test::TCP" : "0",
             "perl" : "5.010"
@@ -62,23 +65,26 @@
       }
    },
    "provides" : {
-      "Dancer::Plugin::Deferred" : {
-         "file" : "lib/Dancer/Plugin/Deferred.pm",
-         "version" : "0.003"
+      "Dancer2::Plugin::Deferred" : {
+         "file" : "lib/Dancer2/Plugin/Deferred.pm",
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/dagolden/dancer-plugin-deferred/issues"
+         "web" : "https://github.com/dagolden/dancer2-plugin-deferred/issues"
       },
-      "homepage" : "https://metacpan.org/release/Dancer-Plugin-Deferred",
+      "homepage" : "https://metacpan.org/release/Dancer2-Plugin-Deferred",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/dagolden/dancer-plugin-deferred.git",
-         "web" : "https://github.com/dagolden/dancer-plugin-deferred"
+         "url" : "git://github.com/dagolden/dancer2-plugin-deferred.git",
+         "web" : "https://github.com/dagolden/dancer2-plugin-deferred"
       }
    },
-   "version" : "0.003"
+   "version" : "0.004",
+   "x_contributors" : [
+      "Damien Krotkine <dams@zarb.org>"
+   ]
 }
 
