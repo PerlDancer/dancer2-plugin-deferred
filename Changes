@@ -2,6 +2,8 @@ Revision history for Dancer2-Plugin-Deferred
 
 {{$NEXT}}
 
+0.004     2013-03-06 20:48:23 America/New_York
+
   [CHANGED]
 
   - Forked into Dancer2::Plugin::Deferred for proper Dancer2 support
