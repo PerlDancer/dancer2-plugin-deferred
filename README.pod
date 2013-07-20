@@ -1,12 +1,14 @@
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
 Dancer2::Plugin::Deferred - Defer messages or data across redirections
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@
       "David Golden <dagolden@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.131560",
    "license" : [
       "apache_2_0"
    ],
@@ -41,7 +41,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Dancer2::Plugin" : "0",
+            "Dancer2::Plugin" : "0.05",
             "URI" : "0",
             "URI::QueryParam" : "0",
             "perl" : "5.010",
@@ -67,7 +67,7 @@
    "provides" : {
       "Dancer2::Plugin::Deferred" : {
          "file" : "lib/Dancer2/Plugin/Deferred.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -82,7 +82,8 @@
          "web" : "https://github.com/dagolden/dancer2-plugin-deferred"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
+   "x_authority" : "cpan:DAGOLDEN",
    "x_contributors" : [
       "Damien Krotkine <dams@zarb.org>"
    ]
