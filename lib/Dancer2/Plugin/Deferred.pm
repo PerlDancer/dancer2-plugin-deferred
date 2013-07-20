@@ -214,7 +214,7 @@ variable to true to ensure the message remains to be retrieved by the link.
 * C<var_key: dpdid> -- this is the key in the C<var> hash containing the message ID
 * C<var_keep_key: dpd_keep> -- if this key in C<var> is true, retrieving values will not be destructive
 * C<params_key: dpdid> -- this is the key in the C<params> hash containing the message ID
-* C<session_key_prefix>: dpd_> -- the message ID is appended to this prefix and used to store deferred data in the session
+* C<session_key_prefix: dpd_> -- the message ID is appended to this prefix and used to store deferred data in the session
 * C<template_key: deferred> -- this is the key to deferred data passed to the template
 
 =head1 SEE ALSO

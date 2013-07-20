@@ -67,7 +67,7 @@
    "provides" : {
       "Dancer2::Plugin::Deferred" : {
          "file" : "lib/Dancer2/Plugin/Deferred.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -82,7 +82,7 @@
          "web" : "https://github.com/dagolden/dancer2-plugin-deferred"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_authority" : "cpan:DAGOLDEN",
    "x_contributors" : [
       "Damien Krotkine <dams@zarb.org>"

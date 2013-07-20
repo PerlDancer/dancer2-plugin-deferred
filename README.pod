@@ -8,7 +8,7 @@ Dancer2::Plugin::Deferred - Defer messages or data across redirections
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -98,7 +98,7 @@ C<params_key: dpdid> -- this is the key in the C<params> hash containing the mes
 
 =item *
 
-C<session_key_prefix>: dpd_> -- the message ID is appended to this prefix and used to store deferred data in the session
+C<session_key_prefix: dpd_> -- the message ID is appended to this prefix and used to store deferred data in the session
 
 =item *
 
