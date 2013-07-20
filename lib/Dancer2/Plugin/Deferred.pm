@@ -10,7 +10,7 @@ use Carp qw/croak/;
 use URI;
 use URI::QueryParam;
 
-use Dancer2::Plugin;
+use Dancer2::Plugin 0.05;
 
 my $conf;
 
@@ -92,11 +92,8 @@ sub _get_conf {
     };
 }
 
-# XXX gross hack until D2::Plugin gets support for acting on
-# every import
-
-sub import {
-    my $dsl = Dancer2::Plugin::_get_dsl();
+on_plugin_import {
+    my $dsl = shift;
 
     $dsl->app->add_hook(
         Dancer2::Core::Hook->new(
@@ -135,9 +132,9 @@ sub import {
             }
         )
     );
-}
+};
 
-register_plugin for_versions => [2];
+register_plugin;
 
 1;
 
