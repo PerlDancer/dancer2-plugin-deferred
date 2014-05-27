@@ -10,7 +10,7 @@ use Carp qw/croak/;
 use URI;
 use URI::QueryParam;
 
-use Dancer2::Plugin 0.05;
+use Dancer2::Plugin qw(:no_dsl);
 
 my $conf;
 
@@ -88,7 +88,7 @@ sub _get_conf {
         params_key         => 'dpdid',
         session_key_prefix => 'dpd_',
         template_key       => 'deferred',
-        %{ plugin_setting() },
+        
     };
 }
 
