@@ -4,7 +4,7 @@ use warnings;
 use Test::More 0.96 import => ['!pass'];
 use Test::TCP;
 
-use Dancer2 ':syntax';
+use Dancer2;
 use Dancer2::Plugin::Deferred;
 use LWP::UserAgent;
 
