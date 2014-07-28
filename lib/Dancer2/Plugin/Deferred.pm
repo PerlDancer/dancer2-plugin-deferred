@@ -15,7 +15,7 @@ use Dancer2::Plugin qw(:no_dsl);
 my $conf;
 
 register 'deferred' => sub {
-    my ( $dsl, $key, $value ) = plugin_args(@_);
+    my ( $dsl, @messages ) = plugin_args(@_);
     $conf ||= _get_conf();
     my $app     = $dsl->app;
     my $context = $app->context;
@@ -25,13 +25,18 @@ register 'deferred' => sub {
     # another session
     my $data = $app->session( $conf->{session_key_prefix} . $id ) || {};
 
-    # set value or destructively retrieve it
-    if ( defined $value ) {
-        $data->{$key} = $value;
-    }
-    else {
-        $value =
-          $context->var( $conf->{var_keep_key} ) ? $data->{$key} : delete $data->{$key};
+    my $value;
+    while (@messages) {
+        my $key = shift @messages;
+        $value  = shift @messages;
+        # set value or destructively retrieve it
+        if ( defined $value ) {
+            $data->{$key} = $value;
+        }
+        else {
+            $value =
+              $context->var( $conf->{var_keep_key} ) ? $data->{$key} : delete $data->{$key};
+        }
     }
 
     # store remaining data or clear it if no deferred messages are left
