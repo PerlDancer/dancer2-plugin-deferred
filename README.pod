@@ -160,6 +160,9 @@ David Golden <dagolden@cpan.org>
 
 Damien Krotkine <dams@zarb.org>
 
+deluxaran <deluxaran@cpan.org>
+
+
 =head1 COPYRIGHT AND LICENSE
 
 This software is Copyright (c) 2012 by David Golden.
