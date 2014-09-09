@@ -2,12 +2,21 @@ Revision history for Dancer2-Plugin-Deferred
 
 {{$NEXT}}
 
+0.007015     2014-07-20 16:02:39 America/New_York
+
+  [CHANGED]
+
+  - Removed context calls for all versions starting with version 0.150000 of Dancer2.
+  - Keeping the backward compatible version with all the lower versions. 
+
+
 0.007001     2014-07-20 16:02:39 America/New_York
 
   [CHANGED]
 
   - Updated internal workarounds to use new features in Dancer2. Removed the Dancer2 version prereq.
   Dancer2::Plugin now used without dsl. Updated tests to work on both newer and also on older versions of Dancer2.
+
 
 0.005     2013-07-20 16:02:39 America/New_York
 
