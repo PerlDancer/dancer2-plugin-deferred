@@ -11,7 +11,7 @@ use Carp qw/croak/;
 use URI;
 use URI::QueryParam;
 
-use Dancer2::Plugin qw(:no_dsl);
+use Dancer2::Plugin;
 
 my $conf;
 
