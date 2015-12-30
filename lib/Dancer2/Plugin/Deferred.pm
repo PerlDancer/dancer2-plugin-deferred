@@ -20,7 +20,7 @@ register 'deferred' => sub {
     $conf ||= _get_conf();
     my $app = $dsl->app;
     my $context;
-    if ( $Dancer2::VERSION < 0.15 ) {
+    if ( $Dancer2::VERSION && $Dancer2::VERSION < 0.15 ) {
         $context = $app->context;
     }
 
@@ -30,7 +30,7 @@ register 'deferred' => sub {
     # another session
     my $data;
     
-    if ( $Dancer2::VERSION < 0.15 ) {
+    if ( $Dancer2::VERSION && $Dancer2::VERSION < 0.15 ) {
         $data = $app->session( $conf->{session_key_prefix} . $id ) || {};
     }
     else {
@@ -43,7 +43,7 @@ register 'deferred' => sub {
         $data->{$key} = $value;
     }
     else {
-        if ( $Dancer2::VERSION < 0.15 ) {
+        if ( $Dancer2::VERSION && $Dancer2::VERSION < 0.15 ) {
             $value = $context->var( $conf->{var_keep_key} ) ? $data->{$key} : delete $data->{$key};
         }
         else {
@@ -53,7 +53,7 @@ register 'deferred' => sub {
     }
 
     # store remaining data or clear it if no deferred messages are left
-    if ( $Dancer2::VERSION < 0.15 ) {
+    if ( $Dancer2::VERSION && $Dancer2::VERSION < 0.15 ) {
         if ( keys %$data ) {
             $app->session( $conf->{session_key_prefix} . $id => $data );
             $context->var( $conf->{var_key} => $id );
@@ -82,19 +82,19 @@ sub _get_all_deferred {
     my $dsl = shift;
     my $app = $dsl->app;
     my $context;
-    if ( $Dancer2::VERSION < 0.15 ) {
+    if ( $Dancer2::VERSION && $Dancer2::VERSION < 0.15 ) {
         $context = $app->context;
     }
 
     my $id = _get_id($dsl);
     my $data;
-    if ( $Dancer2::VERSION < 0.15 ) {
+    if ( $Dancer2::VERSION && $Dancer2::VERSION < 0.15 ) {
         $data = $app->session( $conf->{session_key_prefix} . $id ) || {};
     }
     else {
         $data = $dsl->session( $conf->{session_key_prefix} . $id ) || {};
     }
-    if ( $Dancer2::VERSION < 0.15 ) {
+    if ( $Dancer2::VERSION && $Dancer2::VERSION < 0.15 ) {
     
         unless ( $context->var( $conf->{var_keep_key} ) ) {
             $app->session->delete( $conf->{session_key_prefix} . $id );
@@ -116,7 +116,7 @@ sub _get_deferred_param {
     my $dsl = shift;
     $conf ||= _get_conf();
 
-    if ( $Dancer2::VERSION < 0.15 ) {
+    if ( $Dancer2::VERSION && $Dancer2::VERSION < 0.15 ) {
         $dsl->app->context->var( $conf->{var_keep_key} => 1 );
         return ( $conf->{params_key} => $dsl->app->context->var( $conf->{var_key} ) );
 
@@ -132,7 +132,7 @@ sub _get_id {
     my $dsl = shift;
     $conf ||= _get_conf();
 
-    if ( $Dancer2::VERSION < 0.15 ) {
+    if ( $Dancer2::VERSION && $Dancer2::VERSION < 0.15 ) {
         return $dsl->app->context->var( $conf->{var_key} )
             || sprintf( "%08d", int( rand(100_000_000) ) );
     }
@@ -175,7 +175,7 @@ on_plugin_import {
                 $conf ||= _get_conf();
                 my $id;
                
-                if ( $Dancer2::VERSION < 0.15 ) {
+                if ( $Dancer2::VERSION && $Dancer2::VERSION < 0.15 ) {
                     $id = $dsl->context->request->params->{$conf->{params_key}};
                     $dsl->app->context->var( $conf->{var_key} => $id )
                     if $id;
@@ -196,7 +196,7 @@ on_plugin_import {
             code => sub {
                 my $response = shift;
                 $conf ||= _get_conf();
-                if ( $Dancer2::VERSION < 0.15 ) {
+                if ( $Dancer2::VERSION && $Dancer2::VERSION < 0.15 ) {
                     if ( $dsl->app->context->var( $conf->{var_key} ) && $response->status =~ /^3/ ) {
                         my $u = URI->new( $response->header("Location") );
                         $u->query_param( _get_deferred_param($dsl) );
