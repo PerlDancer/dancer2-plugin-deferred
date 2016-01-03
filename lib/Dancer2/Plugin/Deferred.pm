@@ -16,7 +16,7 @@ use Dancer2::Plugin;
 my $conf;
 
 register 'deferred' => sub {
-    my ( $dsl, $key, $value ) = plugin_args(@_);
+    my ( $dsl, $key, $value ) = @_;
     $conf ||= _get_conf();
     my $app = $dsl->app;
     my $context;
