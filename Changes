@@ -2,6 +2,8 @@ Revision history for Dancer2-Plugin-Deferred
 
 {{$NEXT}}
   - Use 'Test::Plack' instead of 'Test::TCP' in tests. (GH#7, xsawyerx)  
+  - make plugin compatible with the upcoming backward-compatible layer.
+    (GH#8, xsawyerx)
 
 0.007015     2014-07-20 16:02:39 America/New_York
 
