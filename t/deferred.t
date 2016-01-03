@@ -2,56 +2,22 @@ use 5.010;
 use strict;
 use warnings;
 use Test::More 0.96 import => ['!pass'];
-use Test::TCP;
+use Plack::Test;
+use HTTP::Request::Common;
+use HTTP::Cookies;
 
-use Dancer2;
-use Dancer2::Plugin::Deferred;
-use LWP::UserAgent;
-
-test_tcp(
-  client => sub {
-    
-    my $port = shift;
-    my $url  = "http://localhost:$port/";
-
-    my $ua = LWP::UserAgent->new( cookie_jar => {} );
-    my $res;
-
-    $res = $ua->get($url . "show");
-    like $res->content, qr/^message:\s*$/sm, "no messages pending";
-
-    $res = $ua->get($url . "direct/hello");
-    like $res->content, qr/^message: hello/sm, "message set and returned";
-
-    $res = $ua->get($url . "show");
-    like $res->content, qr/^message:\s*$/sm, "no messages pending";
-
-    $res = $ua->get($url . "indirect/goodbye");
-    like $res->content, qr/^message: goodbye/sm, "message set and returned";
-
-    $res = $ua->get($url . "show");
-    like $res->content, qr/^message:\s*$/sm, "no messages pending";
-
-  },
-
-  server => sub {
-    my $port = shift;
+{
+    package App;
+    use Dancer2;
+    use Dancer2::Plugin::Deferred;
 
     set confdir => '.';
-    set port => $port, startup_info => 0;
-
-     if( $Dancer2::VERSION < 0.14 ){        
-	Dancer2->runner->server->port($port);    }
-     else {        
-	Dancer2->runner->{'port'} = $port; 
-     }
 
     @{engine('template')->config}{qw(start_tag end_tag)} = qw(<% %>);
 
     set show_errors => 1;
-
-    set views => path( 't', 'views' );
-    set session => 'Simple';
+    set views       => path( 't', 'views' );
+    set session     => 'Simple';
 
     get '/direct/:message' => sub {
       deferred msg => params->{message};
@@ -70,10 +36,71 @@ test_tcp(
     get '/show' => sub {
       template 'index';
     };
+};
 
-    start;
-  },
-);
+my $test = Plack::Test->create( App->to_app );
+my $url  = "http://localhost/";
+my $jar  = HTTP::Cookies->new;
+
+{
+    my $res = $test->request(GET $url . "show");
+    like $res->content, qr/^message:\s*$/sm, "no messages pending";
+    $jar->extract_cookies($res);
+}
+
+{
+    my $req = GET $url . "direct/hello";
+    $jar->add_cookie_header($req);
+    my $res = $test->request($req);
+    like $res->content, qr/^message: hello/sm, "message set and returned";
+    $jar->extract_cookies($res);
+}
+
+{
+    my $req = GET $url . "show";
+    $jar->add_cookie_header($req);
+    my $res = $test->request($req);
+    like $res->content, qr/^message:\s*$/sm, "no messages pending";
+    $jar->extract_cookies($res);
+}
+
+my $loc;
+{
+    my $req = GET $url . "indirect/goodbye";
+    $jar->add_cookie_header($req);
+    my $res = $test->request($req);
+    ok( $res->is_redirect, 'indirect/goodbye redirects' );
+    $loc = $res->header('Location')->as_string;
+    like( $loc, qr{^http://localhost/fake}, 'to /fake' );
+    $jar->extract_cookies($res);
+}
+
+{
+    my $req = GET $loc;
+    $jar->add_cookie_header($req);
+    my $res = $test->request($req);
+    ok( $res->is_redirect, '/fake redirects' );
+    $loc = $res->header('Location')->as_string;
+    like( $loc, qr{^http://localhost/show}, 'to /show' );
+    $jar->extract_cookies($res);
+}
+
+{
+    my $req = GET $loc;
+    $jar->add_cookie_header($req);
+    my $res = $test->request($req);
+    like $res->content, qr/^message: goodbye/sm, "message set and returned";
+    $jar->extract_cookies($res);
+}
+
+{
+    my $req = GET $url . "show";
+    $jar->add_cookie_header($req);
+    my $res = $test->request($req);
+    like $res->content, qr/^message:\s*$/sm, "no messages pending";
+    $jar->extract_cookies($res);
+}
+
 done_testing;
 
 # COPYRIGHT
