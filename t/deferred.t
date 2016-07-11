@@ -38,6 +38,14 @@ use HTTP::Cookies;
     };
 };
 
+{
+    package App2;
+    # import plugin a second time
+    # https://github.com/PerlDancer/dancer2-plugin-deferred/pull/9
+    use Dancer2 appname => 'App';
+    use Dancer2::Plugin::Deferred;
+}
+
 my $test = Plack::Test->create( App->to_app );
 my $url  = "http://localhost/";
 my $jar  = HTTP::Cookies->new;
