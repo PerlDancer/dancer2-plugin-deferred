@@ -3,7 +3,8 @@ use strict;
 use warnings;
 
 package Dancer2::Plugin::Deferred;
-
+our $AUTHORITY = 'cpan:YANICK';
+$Dancer2::Plugin::Deferred::VERSION = '0.007017';
 # ABSTRACT: Defer messages or data across redirections
 # VERSION
 
@@ -151,7 +152,22 @@ sub BUILD {
 
 1;
 
-=for Pod::Coverage method_names_here
+
+# vim: ts=4 sts=4 sw=4 et:
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Dancer2::Plugin::Deferred - Defer messages or data across redirections
+
+=head1 VERSION
+
+version 0.007017
 
 =head1 SYNOPSIS
 
@@ -193,6 +209,8 @@ construct a hyperlink for a message to be retrieved later.  In this case,
 the message is preserved past the template hook.  (The template should be
 sure not to render the message if not desired.)
 
+=for Pod::Coverage method_names_here
+
 =head1 USAGE
 
 =head2 deferred
@@ -204,7 +222,7 @@ This function works just like C<var> or C<session>, except that it lasts only
 for the current request and across any redirects.  Data is deleted if accessed.
 If a key is set to an undefined value, the key is deleted from the deferred
 data hash.
-  
+
 =head2 all_deferred
 
   template 'index', { deferred => all_deferred };
@@ -223,8 +241,7 @@ variable to true to ensure the message remains to be retrieved by the link.
 
 =head1 CONFIGURATION
 
-=for :list
-* C<var_key: dpdid> -- this is the key in the C<var> hash containing the message ID
+=for :list * C<var_key: dpdid> -- this is the key in the C<var> hash containing the message ID
 * C<var_keep_key: dpd_keep> -- if this key in C<var> is true, retrieving values will not be destructive
 * C<params_key: dpdid> -- this is the key in the C<params> hash containing the message ID
 * C<session_key_prefix: dpd_> -- the message ID is appended to this prefix and used to store deferred data in the session
@@ -232,8 +249,7 @@ variable to true to ensure the message remains to be retrieved by the link.
 
 =head1 SEE ALSO
 
-=for :list
-* L<Dancer2>
+=for :list * L<Dancer2>
 * L<Dancer::Plugin::FlashMessage>
 * L<Dancer::Plugin::FlashNote>
 * L<Catalyst::Plugin::StatusMessage>
@@ -243,6 +259,30 @@ variable to true to ensure the message remains to be retrieved by the link.
 Thank you to mst for explaining why L<Catalyst::Plugin::StatusMessages> does
 what it does and putting up with my dumb ideas along the way.
 
-=cut
+=head1 AUTHORS
 
-# vim: ts=4 sts=4 sw=4 et:
+=over 4
+
+=item *
+
+David Golden <dagolden@cpan.org>
+
+=item *
+
+Yanick Champoux <yanick@cpan.org>
+
+=item *
+
+Deluxaran <deluxaran@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by David Golden.
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
+
+=cut
