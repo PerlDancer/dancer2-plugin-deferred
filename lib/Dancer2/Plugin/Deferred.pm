@@ -7,216 +7,147 @@ package Dancer2::Plugin::Deferred;
 # ABSTRACT: Defer messages or data across redirections
 # VERSION
 
-use Carp qw/croak/;
+use Dancer2::Core::Types qw/Str/;
 use URI;
 use URI::QueryParam;
 
-use Dancer2::Plugin;
+use Dancer2::Plugin 0.200000;
 
-my $conf;
+has var_key => (
+    is => 'ro',
+    isa => Str,
+    from_config => sub { 'dpdid' },
+);
 
-register 'deferred' => sub {
-    my ( $dsl, $key, $value ) = @_;
-    $conf ||= _get_conf();
-    my $app = $dsl->app;
-    my $context;
-    if ( $Dancer2::VERSION && $Dancer2::VERSION < 0.15 ) {
-        $context = $app->context;
-    }
+has var_keep_key => (
+    is => 'ro',
+    isa => Str,
+    from_config => sub { 'dpd_keep' },
+);
 
-    my $id = _get_id($dsl);
+has params_key => (
+    is => 'ro',
+    isa => Str,
+    from_config => sub { 'dpdid' },
+);
+
+has session_key_prefix => (
+    is => 'ro',
+    isa => Str,
+    from_config => sub { 'dpd_' },
+);
+
+has template_key => (
+    is => 'ro',
+    isa => Str,
+    from_config => sub { 'deferred' },
+);
+
+plugin_keywords 'deferred', 'all_deferred', 'deferred_param';
+
+sub deferred {
+    my ( $plugin, $key, $value ) = @_;
+    my $app = $plugin->app;
+
+    my $id = $plugin->_get_id;
 
     # message data is flat "dpd_$id" to avoid race condition with
     # another session
-    my $data;
-    
-    if ( $Dancer2::VERSION && $Dancer2::VERSION < 0.15 ) {
-        $data = $app->session( $conf->{session_key_prefix} . $id ) || {};
-    }
-    else {
-        $data = $dsl->session( $conf->{session_key_prefix} . $id ) || {};
-    }
-   
+    my $data = $app->session->read(  $plugin->session_key_prefix . $id ) || {};
     
     # set value or destructively retrieve it
     if ( defined $value ) {
         $data->{$key} = $value;
     }
     else {
-        if ( $Dancer2::VERSION && $Dancer2::VERSION < 0.15 ) {
-            $value = $context->var( $conf->{var_keep_key} ) ? $data->{$key} : delete $data->{$key};
-        }
-        else {
-            $value = $app->request->var( $conf->{var_keep_key} ) ? $data->{$key} : delete $data->{$key};
-        }
-
+        $value =
+            $app->request->var( $plugin->var_keep_key )
+          ? $data->{$key}
+          : delete $data->{$key};
     }
 
     # store remaining data or clear it if no deferred messages are left
-    if ( $Dancer2::VERSION && $Dancer2::VERSION < 0.15 ) {
-        if ( keys %$data ) {
-            $app->session( $conf->{session_key_prefix} . $id => $data );
-            $context->var( $conf->{var_key} => $id );
-        }
-        else {
-            $app->session->delete( $conf->{session_key_prefix} . $id );
-            $context->var( $conf->{var_key} => undef );
-        }
-    } else {
-        if ( keys %$data ) {
-            $dsl->session( $conf->{session_key_prefix} . $id => $data );
-            $app->request->var( $conf->{var_key} => $id );
-        }
-        else {
-            $dsl->session->delete( $conf->{session_key_prefix} . $id );
-            $app->request->var( $conf->{var_key} => undef );
-        }
+    if ( keys %$data ) {
+        $app->session->write( $plugin->session_key_prefix . $id => $data );
+        $app->request->var( $plugin->var_key => $id );
+    }
+    else {
+        $app->session->delete( $plugin->session_key_prefix . $id );
+        $app->request->var( $plugin->var_key => undef );
     }
     return $value;
 };
 
-# destructively return all keys
-register 'all_deferred' => \&_get_all_deferred;
+sub all_deferred {
+    my $plugin = shift;
+    my $app = $plugin->app;
 
-sub _get_all_deferred {
-    my $dsl = shift;
-    my $app = $dsl->app;
-    my $context;
-    if ( $Dancer2::VERSION && $Dancer2::VERSION < 0.15 ) {
-        $context = $app->context;
-    }
+    my $id = $plugin->_get_id;
+    my $data = $plugin->app->session->read( $plugin->session_key_prefix . $id ) || {};
 
-    my $id = _get_id($dsl);
-    my $data;
-    if ( $Dancer2::VERSION && $Dancer2::VERSION < 0.15 ) {
-        $data = $app->session( $conf->{session_key_prefix} . $id ) || {};
-    }
-    else {
-        $data = $dsl->session( $conf->{session_key_prefix} . $id ) || {};
-    }
-    if ( $Dancer2::VERSION && $Dancer2::VERSION < 0.15 ) {
-    
-        unless ( $context->var( $conf->{var_keep_key} ) ) {
-            $app->session->delete( $conf->{session_key_prefix} . $id );
-                $context->var( $conf->{var_key}, undef );
-        }
-    }
-    else {
-        unless ( $app->request->var( $conf->{var_keep_key} ) ) {
-            $app->session->delete( $conf->{session_key_prefix} . $id );
-            $app->request->var( $conf->{var_key}, undef );
-        }
+    unless ( $app->request->var( $plugin->var_keep_key ) ) {
+        $app->session->delete( $plugin->session_key_prefix . $id );
+        $app->request->var( $plugin->var_key, undef );
     }
     return $data;
 }
 
-register 'deferred_param' => \&_get_deferred_param;
+sub deferred_param {
+    my $plugin = shift;
 
-sub _get_deferred_param {
-    my $dsl = shift;
-    $conf ||= _get_conf();
+    $plugin->app->request->var( $plugin->var_keep_key => 1 );
 
-    if ( $Dancer2::VERSION && $Dancer2::VERSION < 0.15 ) {
-        $dsl->app->context->var( $conf->{var_keep_key} => 1 );
-        return ( $conf->{params_key} => $dsl->app->context->var( $conf->{var_key} ) );
-
-    }
-    else {
-        $dsl->app->request->var( $conf->{var_keep_key} => 1 );
-        return ( $conf->{params_key} => $dsl->app->request->var( $conf->{var_key} ) );
-    }
+    return ( $plugin->params_key => $plugin->app->request->var( $plugin->var_key ) );
 }
 
 # not crypto strong, but will be stored in session, which should be
 sub _get_id {
-    my $dsl = shift;
-    $conf ||= _get_conf();
+    my $plugin = shift;
 
-    if ( $Dancer2::VERSION && $Dancer2::VERSION < 0.15 ) {
-        return $dsl->app->context->var( $conf->{var_key} )
-            || sprintf( "%08d", int( rand(100_000_000) ) );
-    }
-    else {
-        return $dsl->app->request->var( $conf->{var_key} )
+    return $plugin->app->request->var( $plugin->var_key )
       || sprintf( "%08d", int( rand(100_000_000) ) );
-    }
-
 }
 
+sub BUILD {
+    my $plugin = shift;
 
-sub _get_conf {
-    return {
-        var_key            => 'dpdid',
-        var_keep_key       => 'dpd_keep',
-        params_key         => 'dpdid',
-        session_key_prefix => 'dpd_',
-        template_key       => 'deferred',
-    };
-}
-
-on_plugin_import {
-    my $dsl = shift;
-
-    $dsl->app->add_hook(
+    $plugin->app->add_hook(
         Dancer2::Core::Hook->new(
             name => 'before_template',
             code => sub {
                 my $data = shift;
-                $conf ||= _get_conf();
-                $data->{$conf->{template_key}} = _get_all_deferred($dsl);
+                $data->{$plugin->template_key} = $plugin->all_deferred;
             }
         )
     );
 
-    $dsl->app->add_hook(
+    $plugin->app->add_hook(
         Dancer2::Core::Hook->new(
             name => 'before',
             code => sub {
-                $conf ||= _get_conf();
-                my $id;
-               
-                if ( $Dancer2::VERSION && $Dancer2::VERSION < 0.15 ) {
-                    $id = $dsl->context->request->params->{$conf->{params_key}};
-                    $dsl->app->context->var( $conf->{var_key} => $id )
-                    if $id;
-                }
-                else {
-                    $id = $dsl->app->request->params->{$conf->{params_key}};
-                    $dsl->app->request->var( $conf->{var_key} => $id )
-                    if $id;
-                }
-                
+                my $id = $plugin->app->request->params->{ $plugin->params_key };
+                $plugin->app->request->var( $plugin->var_key => $id )
+                  if $id;
             }
         )
     );
 
-    $dsl->app->add_hook(
+    $plugin->app->add_hook(
         Dancer2::Core::Hook->new(
             name => 'after',
             code => sub {
                 my $response = shift;
-                $conf ||= _get_conf();
-                if ( $Dancer2::VERSION && $Dancer2::VERSION < 0.15 ) {
-                    if ( $dsl->app->context->var( $conf->{var_key} ) && $response->status =~ /^3/ ) {
-                        my $u = URI->new( $response->header("Location") );
-                        $u->query_param( _get_deferred_param($dsl) );
-                        $response->header( "Location" => $u );
-                    }
-                }
-                else {
-                    if ( $dsl->app->request->var( $conf->{var_key} ) && $response->status =~ /^3/ ) {
+                if (   $plugin->app->request->var( $plugin->var_key )
+                    && $response->status =~ /^3/ )
+                {
                     my $u = URI->new( $response->header("Location") );
-                    $u->query_param(
-                        _get_deferred_param($dsl));
+                    $u->query_param( $plugin->deferred_param );
                     $response->header( "Location" => $u );
-                    }
                 }
             }
         )
     );
 };
-
-register_plugin;
 
 1;
 
