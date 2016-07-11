@@ -1,8 +1,13 @@
 Revision history for Dancer2-Plugin-Deferred
 
 {{$NEXT}}
-  - Update the plugin to be compatible with new Plugin2 system.
-      (GH#9, syspete)
+
+0.007017 2016-07-11
+  - Update the plugin to be compatible with new Plugin2 system. (GH#9,
+    syspete)
+
+  [ STATISTICS ]
+    - code churn: 5 files changed, 94 insertions(+), 222 deletions(-)
 
 0.007016 2016-01-03
   - Use 'Test::Plack' instead of 'Test::TCP' in tests. (GH#7, xsawyerx)  
