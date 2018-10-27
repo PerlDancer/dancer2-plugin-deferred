@@ -1,6 +1,7 @@
 Revision history for Dancer2-Plugin-Deferred
 
 {{$NEXT}}
+    - fix syntax error in SYNOPSIS. (GH#11, Julien Fiegehenn)
 
 0.007017 2016-07-11
   - Update the plugin to be compatible with new Plugin2 system. (GH#9,
