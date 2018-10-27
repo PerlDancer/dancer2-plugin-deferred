@@ -160,11 +160,11 @@ sub BUILD {
   get '/defer' => sub {
     deferred error => "Klaatu barada nikto";
     redirect '/later';
-  }
+  };
 
   get '/later' => sub {
     template 'later';
-  }
+  };
 
   # in template 'later.tt'
   <% IF deferred.error %>
