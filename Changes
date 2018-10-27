@@ -1,7 +1,23 @@
 Revision history for Dancer2-Plugin-Deferred
 
 {{$NEXT}}
-    - fix syntax error in SYNOPSIS. (GH#11, Julien Fiegehenn)
+  [ API CHANGES ]
+
+  [ BUG FIXES ]
+
+  [ DOCUMENTATION ]
+
+  [ ENHANCEMENTS ]
+
+  [ NEW FEATURES ]
+
+  [ STATISTICS ]
+
+0.007018 2018-10-27
+  - fix syntax error in SYNOPSIS. (GH#11, Julien Fiegehenn)
+
+  [ STATISTICS ]
+    - code churn: 2 files changed, 10 insertions(+), 4 deletions(-)
 
 0.007017 2016-07-11
   - Update the plugin to be compatible with new Plugin2 system. (GH#9,
