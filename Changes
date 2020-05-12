@@ -9,6 +9,7 @@ Revision history for Dancer2-Plugin-Deferred
   [ DOCUMENTATION ]
 
   [ ENHANCEMENTS ]
+  - Move tests to Test2::V0.
 
   [ NEW FEATURES ]
 
