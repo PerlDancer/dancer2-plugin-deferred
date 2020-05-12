@@ -4,6 +4,7 @@ Revision history for Dancer2-Plugin-Deferred
   [ API CHANGES ]
 
   [ BUG FIXES ]
+  - Fix test breakage that appeared with Dancer2 v0.3.3 (GH#12)
 
   [ DOCUMENTATION ]
 
@@ -27,7 +28,7 @@ Revision history for Dancer2-Plugin-Deferred
     - code churn: 5 files changed, 94 insertions(+), 222 deletions(-)
 
 0.007016 2016-01-03
-  - Use 'Test::Plack' instead of 'Test::TCP' in tests. (GH#7, xsawyerx)  
+  - Use 'Test::Plack' instead of 'Test::TCP' in tests. (GH#7, xsawyerx)
   - make plugin compatible with the upcoming backward-compatible layer.
     (GH#8, xsawyerx)
 
@@ -39,7 +40,7 @@ Revision history for Dancer2-Plugin-Deferred
   [CHANGED]
 
   - Removed context calls for all versions starting with version 0.150000 of Dancer2.
-  - Keeping the backward compatible version with all the lower versions. 
+  - Keeping the backward compatible version with all the lower versions.
 
 
 0.007001     2014-07-20 16:02:39 America/New_York
