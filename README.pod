@@ -20,12 +20,12 @@
 
 This L<Dancer2> plugin provides a method for deferring a one-time message across
 a redirect.  It is similar to "flash" messages, but without the race conditions
-that can result from multiple tabs in a browser or from AJAX requests.  It is
-similar in design to L<Catalyst::Plugin::StatusMessage>, but adapted for Dancer2.
+that can result from multiple tabs in a browser or AJAX requests.  It is
+similar in design to L<Catalyst::Plugin:: StatusMessage> but adapted for Dancer2.
 
 It works by creating a unique message ID within the session that holds deferred
 data.  The message ID is automatically added as a query parameter to redirection
-requests.  It's sort of like a session within a session, but tied to a request
+requests.  It's sort of like a session within a session but tied to a request
 rather than global to the browser.  (It will even chain across multiple
 redirects.)
 
@@ -37,6 +37,7 @@ Alternatively, the message ID parameters can be retrieved and used to
 construct a hyperlink for a message to be retrieved later.  In this case,
 the message is preserved past the template hook.  (The template should be
 sure not to render the message if not desired.)
+		
 
 =head1 USAGE
 
