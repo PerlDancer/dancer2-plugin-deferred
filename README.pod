@@ -48,7 +48,7 @@ sure not to render the message if not desired.)
 
 This function works just like C<var> or C<session>, except that it lasts only
 for the current request and across any redirects.  Data is deleted if accessed.
-If a key is set to an undefined value, the key is deleted from the deferred
+If a key is set to undefined value, the key is deleted from the deferred
 data hash.
   
 =head2 all_deferred
@@ -73,6 +73,5 @@ variable to true to ensure the message remains to be retrieved by the link.
 
 =head1 ACKNOWLEDGMENTS
 
-Thank you to mst for explaining why L<Catalyst::Plugin::StatusMessages> does
+Thank you to mst for explaining why L<Catalyst::Plugin:: StatusMessages> does
 what it does and putting up with my dumb ideas along the way.
-
